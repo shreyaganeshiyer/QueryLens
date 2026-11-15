@@ -5,6 +5,7 @@ import ComingSoon from "./pages/ComingSoon";
 
 import Workspace from "./pages/workSpace";
 import History from './pages/History';
+import Analytics from './pages/Analytics';
 
 import RequireAuth from "./components/auth/requireAuth";
 import Login from "./pages/login";
@@ -19,7 +20,7 @@ export default function App() {
       <Route path="/" element={<RequireAuth> <AppLayout /> </RequireAuth> }>
           <Route path="/" element={<Workspace />} />
           <Route path="/history" element={<History/>} />
-          <Route path="/analytics" element={<ComingSoon title="Analytics" />} />
+          <Route path="/analytics" element={<Analytics/>} />
           <Route
             path="/optimization-lab"
             element={<ComingSoon title="Optimization Lab" />}

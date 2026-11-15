@@ -11,6 +11,8 @@ import { ensureAuthSchema } from './userAuth/authSchema.js';
 import historyRoutes from './routes/history.js';
 import { ensureHistorySchema } from './utility/historyDb.js';
 
+import analyticsRoutes from './routes/analytics.js';
+
 
 // app's database
 import { ensureSchema } from './utility/appDb.js';
@@ -25,7 +27,7 @@ app.use('/api/connections', connectionRoutes);
 app.use('/api/queries', queryRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/history', historyRoutes);
-
+app.use('/api/analytics', analyticsRoutes);
 
 app.listen(PORT, async () => {
   console.log(`QueryLens API running on http://localhost:${PORT}`);

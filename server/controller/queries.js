@@ -78,33 +78,41 @@ export async function execute(req, res) {
     }
 }
 
-export async function analyze(req, res){
-    const pool = requireConnection(res);
-    if (!pool) return;
-    // same shit
-    let sql;
-    try {
-        sql = validateReadOnly(req.body?.sql);
-    } catch (err) {
-        if (err instanceof SqlGuardError) {
-            return res.status(400).json({ ok: false, kind: 'guard', message: err.message });
-        }
-        throw err;
-    }
+export async function analyze(req, res) {
+  const pool = requireConnection(res);
+  if (!pool) return;
 
-    try {
-        // EXPLAIN describes the plan without returning the query's data
-        const [plan] = await pool.query({ sql: `EXPLAIN ${sql}`, timeout: QUERY_TIMEOUT_MS });
-        res.json({ ok: true, plan });
-    } catch (err) {
-        res.status(400).json({
-            ok: false,
-            kind: 'sql',
-            message: err.sqlMessage || friendlyError(err),
-            code: err.code ?? null,
-            line: extractLine(err.sqlMessage),
-        });
+  let sql;
+  try {
+    sql = validateReadOnly(req.body?.sql);
+  } catch (err) {
+    if (err instanceof SqlGuardError) {
+      return res.status(400).json({ ok: false, kind: 'guard', message: err.message });
     }
+    throw err;
+  }
+
+  try {
+    // EXPLAIN FORMAT=JSON describes the plan without returning the query's rows.
+    // MySQL returns the plan as a JSON string in the EXPLAIN column.
+    const [rows] = await pool.query({
+      sql: `EXPLAIN FORMAT=JSON ${sql}`,
+      timeout: QUERY_TIMEOUT_MS,
+    });
+
+    const raw = rows?.[0]?.EXPLAIN;
+    const plan = typeof raw === 'string' ? JSON.parse(raw) : raw;
+
+    res.json({ ok: true, plan });
+  } catch (err) {
+    res.status(400).json({
+      ok: false,
+      kind: 'sql',
+      message: err.sqlMessage || friendlyError(err),
+      code: err.code ?? null,
+      line: extractLine(err.sqlMessage),
+    });
+  }
 }
 
 
