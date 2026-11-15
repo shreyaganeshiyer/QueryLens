@@ -1,4 +1,8 @@
-import mysql from 'mysql2/promise';
+import mysql from "mysql2/promise";
+
+console.log("Inside appDb.js:");
+console.log("USER:", process.env.APP_DB_USER);
+console.log("PASSWORD EXISTS:", Boolean(process.env.APP_DB_PASSWORD));
 
 export const appPool = mysql.createPool({
   host: process.env.APP_DB_HOST,
